@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter Jokes Radio - AI Text to Speech</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #ec4899;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #818cf8, #c084fc, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .voice-selection {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
+        .voice-selection label {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            padding-left: 0.25rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: rgba(15, 23, 42, 0.8);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25rem;
+        }
+
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+        }
+
+        .now-playing {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .joke-title {
+            font-weight: 700;
+            color: #818cf8;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .joke-content {
+            font-style: italic;
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        button {
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            box-shadow: 0 4px 15px -1px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-play:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-stop {
+            background: rgba(236, 72, 153, 0.1);
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            display: none;
+        }
+
+        .btn-stop:hover {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 15px -1px rgba(236, 72, 153, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0) scale(1);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        footer {
+            margin-top: 3rem;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            letter-spacing: 0.025em;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        #status-text {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nasrudin Radio</h1>
+        <p class="subtitle">AI-Powered Wisdom & Wit</p>
+        
+        <div class="voice-selection">
+            <label for="voice-select">Choose Narrator:</label>
+            <select id="voice-select">
+                <option value="Salli">Salli (English)</option>
+                <option value="Joanna">Joanna (English)</option>
+                <option value="Stephen">Stephen (English)</option>
+                <option value="Daniel">Daniel (English)</option>
+                <option value="Hannah">Hannah (English)</option>
+                <option value="Liam">Liam (English)</option>
+                <option value="Lisa">Lisa (English)</option>
+                <option value="Olivia">Olivia (English)</option>
+                <option value="Pedro">Pedro (Spanish)</option>
+                <option value="Andres">Andres (Spanish)</option>
+                <option value="Bianca">Bianca (Portuguese)</option>
+                <option value="Camila">Camila (Portuguese)</option>
+                <option value="Celine">Celine (French)</option>
+                <option value="Remi">Remi (French)</option>
+                <option value="Lea">Lea (French)</option>
+                <option value="Ayanda">Ayanda (Zulu)</option>
+                <option value="Kajal">Kajal (Hindi)</option>
+                <option value="Seoyeon">Seoyeon (Korean)</option>
+                <option value="Jihye">Jihye (Korean)</option>
+                <option value="Jasmine">Jasmine (English-Singapore)</option>
+            </select>
+        </div>
+
+        <div class="controls">
+            <button id="play-btn" class="btn-play">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Play Random Jokes
+            </button>
+            <button id="stop-btn" class="btn-stop">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+                Stop Radio
+            </button>
+        </div>
+
+        <div id="status-text">Ready to play</div>
+
+        <div id="joke-display" class="now-playing" style="display: none;">
+            <div id="joke-title" class="joke-title"></div>
+            <div id="joke-content" class="joke-content"></div>
+        </div>
+    </div>
+
+    <footer>
+        Powered by <a href="https://developer.puter.com" target="_blank">Puter</a>
+    </footer>
+
+    <script>
+        const playBtn = document.getElementById('play-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const voiceSelect = document.getElementById('voice-select');
+        const statusText = document.getElementById('status-text');
+        const jokeDisplay = document.getElementById('joke-display');
+        const jokeTitle = document.getElementById('joke-title');
+        const jokeContent = document.getElementById('joke-content');
+
+        let jokes = [];
+        let isPlaying = false;
+        let currentAudio = null;
+
+        async function loadJokes() {
+            try {
+                statusText.innerText = "Loading wisdom...";
+                const response = await fetch('jokes.json');
+                jokes = await response.json();
+                statusText.innerText = `${jokes.length} jokes loaded. Ready to play.`;
+            } catch (error) {
+                console.error('Failed to load jokes:', error);
+                statusText.innerText = "Error loading jokes.json";
+            }
+        }
+
+        async function playRandomJoke() {
+            if (!isPlaying || jokes.length === 0) return;
+
+            const randomIndex = Math.floor(Math.random() * jokes.length);
+            const joke = jokes[randomIndex];
+            const selectedVoice = voiceSelect.value;
+
+            jokeTitle.innerText = `Joke #${joke.id}`;
+            jokeContent.innerText = joke.content;
+            jokeDisplay.style.display = 'flex';
+            statusText.innerHTML = `<span class="status-dot"></span> On Air (Narrator: ${selectedVoice})...`;
+
+            try {
+                // Use Puter TTS to speak the joke with the selected voice
+                currentAudio = await puter.ai.txt2speech(joke.content, { voice: selectedVoice });
+                
+                currentAudio.addEventListener('ended', () => {
+                    if (isPlaying) {
+                        // Wait a second before the next joke
+                        setTimeout(playRandomJoke, 1500);
+                    }
+                });
+
+                await currentAudio.play();
+            } catch (error) {
+                console.error('Playback error:', error);
+                if (isPlaying) setTimeout(playRandomJoke, 2000); // Retry another one
+            }
+        }
+
+        playBtn.addEventListener('click', async () => {
+            if (jokes.length === 0) await loadJokes();
+            if (jokes.length === 0) return;
+
+            isPlaying = true;
+            playBtn.style.display = 'none';
+            stopBtn.style.display = 'flex';
+            
+            playRandomJoke();
+        });
+
+        stopBtn.addEventListener('click', () => {
+            isPlaying = false;
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            stopBtn.style.display = 'none';
+            playBtn.style.display = 'flex';
+            statusText.innerText = "Radio stopped.";
+            jokeDisplay.style.display = 'none';
+        });
+
+        // Initialize
+        loadJokes();
+    </script>
+</body>
+</html>
